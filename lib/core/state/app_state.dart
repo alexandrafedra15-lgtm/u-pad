@@ -3,18 +3,67 @@ import '../../features/tasks/models/task_model.dart';
 import '../../features/canvas/services/canvas_service.dart';
 import '../../features/health/models/health_metrics.dart';
 import '../../features/gamification/models/user_stats.dart';
+import '../../features/schedule/models/schedule_block.dart';
+import '../theme/app_theme.dart';
 
 class AppState extends ChangeNotifier {
   final CanvasService canvasService = CanvasService();
   late HealthMetrics healthMetrics;
   late UserStats userStats;
   List<TaskModel> tasks = [];
+  List<ScheduleBlock> scheduleBlocks = [];
   bool isSyncingCanvas = false;
 
   AppState() {
     healthMetrics = HealthMetrics();
     userStats = UserStats(achievements: UserStats.initialAchievements);
     _initializeDefaultTasks();
+    _initializeDefaultSchedule();
+  }
+
+  void _initializeDefaultSchedule() {
+    scheduleBlocks = [
+      ScheduleBlock(
+        id: '1',
+        dayIndex: 0, // Lunes
+        title: 'CS-201: Algoritmos y Estructuras',
+        location: 'Aula 402 • Pabellón de Sistemas',
+        startTime: '08:00',
+        endTime: '10:00',
+        type: ScheduleType.clase,
+        color: AppTheme.primary,
+      ),
+      ScheduleBlock(
+        id: '2',
+        dayIndex: 0, // Lunes
+        title: 'Bloque de Estudio Focalizado',
+        location: 'Biblioteca Central (3er piso)',
+        startTime: '10:30',
+        endTime: '12:30',
+        type: ScheduleType.estudio,
+        color: AppTheme.primaryDark,
+      ),
+      ScheduleBlock(
+        id: '3',
+        dayIndex: 0, // Lunes
+        title: 'MAT-301: Cálculo Multivariable',
+        location: 'Pabellón B • Aula 204',
+        startTime: '14:00',
+        endTime: '16:00',
+        type: ScheduleType.clase,
+        color: const Color(0xFF6AAF92),
+      ),
+      ScheduleBlock(
+        id: '4',
+        dayIndex: 1, // Martes
+        title: 'FIS-102: Laboratorio de Física',
+        location: 'Lab de Física General',
+        startTime: '09:00',
+        endTime: '11:00',
+        type: ScheduleType.clase,
+        color: AppTheme.primary,
+      ),
+    ];
   }
 
   void _initializeDefaultTasks() {
@@ -78,6 +127,20 @@ class AppState extends ChangeNotifier {
       task.status = TaskStatus.completada;
       awardXp(task.xpReward, reason: 'Tarea completada: ${task.title}');
     }
+    notifyListeners();
+  }
+
+  // Schedule Actions
+  void addScheduleBlock(ScheduleBlock block) {
+    scheduleBlocks.add(block);
+    // Sort by start time
+    scheduleBlocks.sort((a, b) => a.startTime.compareTo(b.startTime));
+    awardXp(25, reason: 'Nuevo bloque en el horario');
+    notifyListeners();
+  }
+
+  void deleteScheduleBlock(String id) {
+    scheduleBlocks.removeWhere((b) => b.id == id);
     notifyListeners();
   }
 
