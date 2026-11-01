@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
 import 'core/state/app_state.dart';
-import 'features/home/presentation/main_scaffold.dart';
+import 'features/onboarding/presentation/onboarding_screen.dart';
 
 class UPadApp extends StatefulWidget {
   const UPadApp({Key? key}) : super(key: key);
@@ -21,7 +21,7 @@ class _UPadAppState extends State<UPadApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      home: MainScaffold(appState: _appState),
+      home: OnboardingScreen(appState: _appState),
     );
   }
 }
