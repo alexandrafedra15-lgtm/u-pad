@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/state/app_state.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   final AppState appState;
@@ -12,12 +13,27 @@ class ProfileScreen extends StatelessWidget {
     final stats = appState.userStats;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('🏆 Mi Perfil & Logros')),
+      appBar: AppBar(
+        title: const Text('🏆 Mi Perfil & Logros'),
+        actions: [
+          IconButton(
+            tooltip: 'Editar Perfil y Metas',
+            icon: const Icon(Icons.edit_outlined, color: AppTheme.primary),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => EditProfileScreen(appState: appState),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Avatar
+            // Avatar and University Info
             Center(
               child: Column(
                 children: [
@@ -32,12 +48,36 @@ class ProfileScreen extends StatelessWidget {
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+                  const SizedBox(height: 2),
                   Text(
-                    '${stats.levelTitle}  •  Nivel ${stats.currentLevel}',
+                    stats.career,
                     style: const TextStyle(
                         fontSize: 13,
                         color: AppTheme.primary,
                         fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    '${stats.university} • ${stats.currentSemester}',
+                    style: const TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textMuted),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppTheme.xpHoney.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${stats.levelTitle} (Nv. ${stats.currentLevel})',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primaryDark,
+                      ),
+                    ),
                   ),
                 ],
               ),

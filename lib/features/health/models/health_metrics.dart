@@ -1,12 +1,12 @@
 class HealthMetrics {
   int waterGlassesCurrent;
-  final int waterGlassesTarget;
+  int waterGlassesTarget;
 
   double sleepHoursLastNight;
-  final double sleepHoursTarget;
+  double sleepHoursTarget;
 
   int exerciseMinutesCurrent;
-  final int exerciseMinutesTarget;
+  int exerciseMinutesTarget;
 
   int healthStreakDays;
 
@@ -20,7 +20,12 @@ class HealthMetrics {
     this.healthStreakDays = 4,
   });
 
-  double get waterProgress => (waterGlassesCurrent / waterGlassesTarget).clamp(0.0, 1.0);
-  double get sleepProgress => (sleepHoursLastNight / sleepHoursTarget).clamp(0.0, 1.0);
-  double get exerciseProgress => (exerciseMinutesCurrent / exerciseMinutesTarget).clamp(0.0, 1.0);
+  double get waterProgress =>
+      (waterGlassesCurrent / (waterGlassesTarget > 0 ? waterGlassesTarget : 1)).clamp(0.0, 1.0);
+
+  double get sleepProgress =>
+      (sleepHoursLastNight / (sleepHoursTarget > 0 ? sleepHoursTarget : 1)).clamp(0.0, 1.0);
+
+  double get exerciseProgress =>
+      (exerciseMinutesCurrent / (exerciseMinutesTarget > 0 ? exerciseMinutesTarget : 1)).clamp(0.0, 1.0);
 }

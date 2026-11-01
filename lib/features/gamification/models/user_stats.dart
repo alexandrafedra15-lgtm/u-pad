@@ -16,13 +16,19 @@ class UserAchievement {
 
 class UserStats {
   String studentName;
+  String university;
+  String career;
+  String currentSemester;
   int currentXp;
   int studyStreakDays;
   List<UserAchievement> achievements;
 
   UserStats({
     this.studentName = 'Alex R.',
-    this.currentXp = 1450,
+    this.university = 'Universidad Nacional de Ingeniería',
+    this.career = 'Ingeniería de Sistemas',
+    this.currentSemester = '5to Ciclo / Semestre',
+    this.currentXp = 1550,
     this.studyStreakDays = 6,
     required this.achievements,
   });
@@ -57,15 +63,15 @@ class UserStats {
     UserAchievement(
       id: 'hydration_master',
       title: 'Cerebro Hidratado',
-      description: 'Llegaste a tu meta de 8 vasos de agua.',
+      description: 'Llegaste a tu meta diaria de vasos de agua.',
       icon: '💧',
       isUnlocked: false,
     ),
     UserAchievement(
-      id: 'early_bird',
-      title: 'Entrega Relámpago',
-      description: 'Entregaste una tarea 48h antes de la fecha límite.',
-      icon: '⚡',
+      id: 'profile_ready',
+      title: 'Identidad Universitaria',
+      description: 'Personalizaste tu universidad, carrera y metas.',
+      icon: '🎓',
       isUnlocked: true,
     ),
   ];

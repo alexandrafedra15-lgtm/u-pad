@@ -106,4 +106,24 @@ class AppState extends ChangeNotifier {
     userStats.currentXp += amount;
     notifyListeners();
   }
+
+  // Profile and Health Targets Update
+  void updateStudentProfile({
+    required String name,
+    required String university,
+    required String career,
+    required String semester,
+    required int waterTarget,
+    required double sleepTarget,
+  }) {
+    userStats.studentName = name;
+    userStats.university = university;
+    userStats.career = career;
+    userStats.currentSemester = semester;
+    healthMetrics.waterGlassesTarget = waterTarget;
+    healthMetrics.sleepHoursTarget = sleepTarget;
+
+    awardXp(30, reason: 'Perfil de estudiante actualizado');
+    notifyListeners();
+  }
 }
