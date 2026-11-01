@@ -1,0 +1,30 @@
+# Binaries
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Dart/Flutter specific
+*.dart_tool/
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+
+# IntelliJ/Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+*.ipa
+
+# Windows
+Thumbs.db
