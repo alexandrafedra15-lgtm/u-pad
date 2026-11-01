@@ -3,6 +3,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/state/app_state.dart';
 import '../../canvas/presentation/canvas_connect_dialog.dart';
 import '../../tasks/models/task_model.dart';
+import '../../pomodoro/presentation/pomodoro_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final AppState appState;
@@ -44,8 +45,20 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Row(
+                    Row(
                     children: [
+                      // Pomodoro Quick Access Button
+                      IconButton(
+                        tooltip: 'Modo Estudio Pomodoro',
+                        icon: const Icon(Icons.timer_outlined, color: AppTheme.primary, size: 22),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => PomodoroScreen(appState: appState),
+                            ),
+                          );
+                        },
+                      ),
                       // Streak Badge
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
