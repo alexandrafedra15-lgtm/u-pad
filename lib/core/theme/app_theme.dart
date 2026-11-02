@@ -1,77 +1,89 @@
 import 'package:flutter/material.dart';
 
-/// U-Pad Color System — Opción A: "Enfoque Orgánico & Calma"
-/// Psicología aplicada: calor humano, antiestrés, recompensa y cero fatiga visual.
+/// Equilibra-U Design System
+/// Estética editorial, minimalista y orgánica. Tonos arena/papel cálido mate para cero fatiga visual.
 class AppTheme {
-  // ─── Primario: Terracota Suave — Motivación cálida, sin ansiedad ───────────
-  static const Color primary      = Color(0xFFE07A5F); // Terracota suave
-  static const Color primaryLight = Color(0xFFEB9F8A); // Melocotón claro
-  static const Color primaryDark  = Color(0xFFC45E44); // Terracota profundo
+  // ─── Colores Principales: Equilibrio, Calma y Foco ────────────────────────
+  static const Color primary       = Color(0xFF284B3E); // Verde bosque profundo (equilibrio)
+  static const Color primaryLight  = Color(0xFF3F6A5B); // Salvia medio
+  static const Color accentRose    = Color(0xFFD87D65); // Terracota cálido sutil
+  static const Color accentSand    = Color(0xFFD4A373); // Arena dorada sutil
 
-  // ─── Salud & Hábitos: Verde Sabio — Serenidad, concentración, bienestar ───
-  static const Color healthGreen   = Color(0xFF81B29A); // Verde sabio principal
-  static const Color waterGreen    = Color(0xFF6AAF92); // Agua y naturaleza
-  static const Color sleepLavender = Color(0xFFB8A9C9); // Lavanda cálido para sueño
-  static const Color exerciseAmber = Color(0xFFF4A261); // Miel dorada para ejercicio
+  // ─── Hábitos & Salud (Tonos mate no chillones) ─────────────────────────────
+  static const Color healthWater   = Color(0xFF4A7C7D); // Azul pizarra mineral
+  static const Color healthSleep   = Color(0xFF5B507A); // Índigo crepuscular
+  static const Color healthActive  = Color(0xFFC86D51); // Arcilla activa
+  static const Color canvasBrand   = Color(0xFFC0392B); // Canvas LMS
 
-  // ─── Gamificación & Recompensas: Miel Dorada — Dopamina positiva ──────────
-  static const Color xpHoney    = Color(0xFFF4A261); // Recompensas, XP, rachas
-  static const Color streakFire = Color(0xFFFA8231); // Racha activa, urgencia suave
-  static const Color canvasRose = Color(0xFFD64045); // Badge Canvas LMS
+  // ─── Superficies & Fondos (Elimina el blanco puro agresivo) ───────────────
+  static const Color bgSand        = Color(0xFFF5F2EB); // Arena suave mate (cero brillo blanco)
+  static const Color surfaceCard   = Color(0xFFFFFFFF); // Blanco cálido para tarjetas
+  static const Color surfaceSubtle = Color(0xFFECE7DE); // Contraste sutil para botones y píldoras
+  static const Color borderSubtle  = Color(0xFFE2DDD2); // Línea fina y limpia
 
-  // ─── Texto ────────────────────────────────────────────────────────────────
-  static const Color textDark  = Color(0xFF2B2D42); // Carbón cálido — alta legibilidad
-  static const Color textMuted = Color(0xFF8D8FA1); // Gris suave para subtítulos
+  // ─── Tipografía ───────────────────────────────────────────────────────────
+  static const Color textMain      = Color(0xFF1B201E); // Grafito bosque muy legible
+  static const Color textSub       = Color(0xFF6E7570); // Gris mineral suave
+  static const Color textLight     = Color(0xFF9EA39F); // Para detalles discretos
 
-  // ─── Superficies Light: Crema Avena — Cero fatiga visual ─────────────────
-  static const Color bgLight   = Color(0xFFFDFBF7); // Crema avena
-  static const Color cardLight = Color(0xFFFFFFFF); // Blanco limpio para cards
-  static const Color divider   = Color(0xFFEEEBE4); // Separadores cálidos
-
-  // ─── Superficies Dark: Oscuro cálido — No frío ni clínico ────────────────
-  static const Color bgDark    = Color(0xFF1E1B18); // Marrón oscuro profundo
-  static const Color cardDark  = Color(0xFF2C2823); // Card oscura cálida
-  static const Color textLight = Color(0xFFFDFBF7); // Crema para texto en dark
+  // Alias compatibles
+  static const Color healthGreen   = primary;
+  static const Color waterGreen    = healthWater;
+  static const Color sleepLavender = healthSleep;
+  static const Color exerciseAmber = healthActive;
+  static const Color xpHoney       = accentSand;
+  static const Color streakFire    = accentRose;
+  static const Color canvasRose    = canvasBrand;
+  static const Color textDark      = textMain;
+  static const Color textMuted     = textSub;
+  static const Color bgLight       = bgSand;
+  static const Color cardLight     = surfaceCard;
+  static const Color divider       = borderSubtle;
 
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       primaryColor: primary,
-      scaffoldBackgroundColor: bgLight,
+      scaffoldBackgroundColor: bgSand,
       colorScheme: const ColorScheme.light(
         primary: primary,
-        secondary: healthGreen,
-        tertiary: xpHoney,
-        surface: cardLight,
-        error: canvasRose,
+        secondary: accentRose,
+        tertiary: accentSand,
+        surface: surfaceCard,
+        error: canvasBrand,
       ),
       cardTheme: CardThemeData(
-        color: cardLight,
+        color: surfaceCard,
         elevation: 0,
-        shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: divider),
+          side: const BorderSide(color: borderSubtle, width: 1),
         ),
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: bgLight,
+        backgroundColor: bgSand,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
-          color: textDark,
+          color: textMain,
           fontSize: 20,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.3,
         ),
-        iconTheme: IconThemeData(color: textDark),
+        iconTheme: IconThemeData(color: textMain),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: cardLight,
-        indicatorColor: const Color(0xFFF5DDD6), // Terracota muy suave
+        backgroundColor: bgSand,
+        indicatorColor: primary.withOpacity(0.12),
+        elevation: 0,
         labelTextStyle: WidgetStateProperty.all(
-          const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+          const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 11,
+            color: textMain,
+          ),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -80,74 +92,23 @@ class AppTheme {
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFFF5F2EC),
+        fillColor: surfaceCard,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: divider),
+          borderSide: const BorderSide(color: borderSubtle),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: divider),
+          borderSide: const BorderSide(color: borderSubtle),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: primary, width: 2),
-        ),
-      ),
-    );
-  }
-
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      primaryColor: primaryLight,
-      scaffoldBackgroundColor: bgDark,
-      colorScheme: const ColorScheme.dark(
-        primary: primaryLight,
-        secondary: healthGreen,
-        tertiary: xpHoney,
-        surface: cardDark,
-        error: canvasRose,
-      ),
-      cardTheme: CardThemeData(
-        color: cardDark,
-        elevation: 0,
-        shadowColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.07)),
-        ),
-      ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: bgDark,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: false,
-        titleTextStyle: TextStyle(
-          color: textLight,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        iconTheme: IconThemeData(color: textLight),
-      ),
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: cardDark,
-        indicatorColor: primary.withOpacity(0.25),
-        labelTextStyle: WidgetStateProperty.all(
-          const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primary,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          borderSide: const BorderSide(color: primary, width: 1.5),
         ),
       ),
     );

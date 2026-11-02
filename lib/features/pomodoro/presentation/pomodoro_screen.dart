@@ -147,8 +147,9 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
         : AppTheme.healthGreen;
 
     return Scaffold(
+      backgroundColor: AppTheme.bgSand,
       appBar: AppBar(
-        title: const Text('⏱️ Modo Estudio Pomodoro'),
+        title: const Text('Estudio Focalizado'),
       ),
       body: SafeArea(
         child: Padding(

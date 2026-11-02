@@ -12,43 +12,49 @@ class HealthScreen extends StatelessWidget {
     final metrics = appState.healthMetrics;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('🌿 Vida Saludable & Hábitos')),
+      backgroundColor: AppTheme.bgSand,
+      appBar: AppBar(title: const Text('Balance & Hábitos')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Streak Banner
+            // Streak Header
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTheme.healthGreen, Color(0xFF5A9E83)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: AppTheme.surfaceCard,
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.borderSubtle),
               ),
               child: Row(
                 children: [
-                  const Text('🧘', style: TextStyle(fontSize: 36)),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.spa_outlined, color: AppTheme.primary, size: 22),
+                  ),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '¡${metrics.healthStreakDays} días cuidando tu cuerpo!',
+                          '${metrics.healthStreakDays} días en equilibrio',
                           style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.textMain,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         const Text(
-                          'Un estudiante descansado rinde el doble.',
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.white70),
+                          'El descanso y la hidratación potencian tu memoria.',
+                          style: TextStyle(fontSize: 12, color: AppTheme.textSub),
                         ),
                       ],
                     ),
@@ -59,143 +65,113 @@ class HealthScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Water Section
-            _buildSectionHeader(
-              '💧 Hidratación',
-              '${metrics.waterGlassesCurrent} de ${metrics.waterGlassesTarget} vasos',
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: List.generate(metrics.waterGlassesTarget, (i) {
-                        final filled = i < metrics.waterGlassesCurrent;
-                        return Icon(
-                          Icons.water_drop,
-                          size: 28,
-                          color: filled
-                              ? AppTheme.waterGreen
-                              : Colors.grey.withOpacity(0.25),
-                        );
-                      }),
+            _buildSectionHeader('Hidratación', '${metrics.waterGlassesCurrent} de ${metrics.waterGlassesTarget} vasos'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceCard,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.borderSubtle),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: List.generate(metrics.waterGlassesTarget, (i) {
+                      final filled = i < metrics.waterGlassesCurrent;
+                      return Icon(
+                        filled ? Icons.water_drop : Icons.water_drop_outlined,
+                        size: 24,
+                        color: filled ? AppTheme.healthWater : AppTheme.borderSubtle,
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.healthWater,
+                      side: const BorderSide(color: AppTheme.healthWater),
+                      minimumSize: const Size.fromHeight(42),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.waterGreen,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(44),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Tomé un vaso de agua  (+15 XP)'),
-                      onPressed: () => appState.addWaterGlass(),
-                    ),
-                  ],
-                ),
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text('Registrar 1 vaso de agua', style: TextStyle(fontWeight: FontWeight.w600)),
+                    onPressed: () => appState.addWaterGlass(),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 20),
 
             // Sleep Section
-            _buildSectionHeader(
-              '😴 Registro de Sueño',
-              '${metrics.sleepHoursLastNight} horas registradas',
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Horas anoche:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(
-                          '${metrics.sleepHoursLastNight}h / 8.0h meta',
-                          style: const TextStyle(
-                              color: AppTheme.sleepLavender,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    Slider(
-                      value: metrics.sleepHoursLastNight,
-                      min: 3.0,
-                      max: 12.0,
-                      divisions: 18,
-                      activeColor: AppTheme.sleepLavender,
-                      label: '${metrics.sleepHoursLastNight}h',
-                      onChanged: (val) => appState
-                          .updateSleep(double.parse(val.toStringAsFixed(1))),
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          metrics.sleepHoursLastNight >= 7.0
-                              ? Icons.check_circle
-                              : Icons.warning_amber,
-                          size: 16,
-                          color: metrics.sleepHoursLastNight >= 7.0
-                              ? AppTheme.healthGreen
-                              : AppTheme.exerciseAmber,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          metrics.sleepHoursLastNight >= 7.0
-                              ? '¡Excelente descanso para retener conceptos!'
-                              : 'Atención: Menos de 7h reduce tu concentración.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: metrics.sleepHoursLastNight >= 7.0
-                                ? AppTheme.healthGreen
-                                : AppTheme.exerciseAmber,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            _buildSectionHeader('Sueño y Descanso', '${metrics.sleepHoursLastNight} horas'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceCard,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.borderSubtle),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Horas anoche:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                      Text(
+                        '${metrics.sleepHoursLastNight}h / 8.0h meta',
+                        style: const TextStyle(color: AppTheme.healthSleep, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                  Slider(
+                    value: metrics.sleepHoursLastNight,
+                    min: 3.0,
+                    max: 12.0,
+                    divisions: 18,
+                    activeColor: AppTheme.healthSleep,
+                    label: '${metrics.sleepHoursLastNight}h',
+                    onChanged: (val) => appState.updateSleep(double.parse(val.toStringAsFixed(1))),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 20),
 
             // Exercise Section
-            _buildSectionHeader(
-              '🏃 Actividad Física',
-              '${metrics.exerciseMinutesCurrent} de ${metrics.exerciseMinutesTarget} min',
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    LinearProgressIndicator(
+            _buildSectionHeader('Movimiento', '${metrics.exerciseMinutesCurrent} de ${metrics.exerciseMinutesTarget} min'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceCard,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.borderSubtle),
+              ),
+              child: Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: LinearProgressIndicator(
                       value: metrics.exerciseProgress,
-                      backgroundColor:
-                          AppTheme.exerciseAmber.withOpacity(0.15),
-                      color: AppTheme.exerciseAmber,
-                      minHeight: 8,
-                      borderRadius: BorderRadius.circular(4),
+                      backgroundColor: AppTheme.borderSubtle.withOpacity(0.5),
+                      valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.healthActive),
+                      minHeight: 5,
                     ),
-                    const SizedBox(height: 14),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildExerciseBtn('🚶 15m Caminata', 15),
-                        _buildExerciseBtn('🏋️ 30m Gym', 30),
-                        _buildExerciseBtn('🧘 20m Yoga', 20),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildExerciseBtn('15m Caminata', 15),
+                      _buildExerciseBtn('30m Ejercicio', 30),
+                      _buildExerciseBtn('20m Yoga/Estiramiento', 20),
+                    ],
+                  ),
+                ],
               ),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -208,12 +184,8 @@ class HealthScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold)),
-          Text(subtitle,
-              style:
-                  const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+          Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.textMain)),
+          Text(subtitle, style: const TextStyle(fontSize: 12, color: AppTheme.textSub)),
         ],
       ),
     );
@@ -222,14 +194,13 @@ class HealthScreen extends StatelessWidget {
   Widget _buildExerciseBtn(String label, int minutes) {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppTheme.exerciseAmber,
-        side: const BorderSide(color: AppTheme.exerciseAmber),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        foregroundColor: AppTheme.healthActive,
+        side: const BorderSide(color: AppTheme.borderSubtle),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       ),
       onPressed: () => appState.logExercise(minutes),
-      child: Text(label, style: const TextStyle(fontSize: 11)),
+      child: Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
     );
   }
 }

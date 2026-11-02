@@ -13,8 +13,9 @@ class ProfileScreen extends StatelessWidget {
     final stats = appState.userStats;
 
     return Scaffold(
+      backgroundColor: AppTheme.bgSand,
       appBar: AppBar(
-        title: const Text('🏆 Mi Perfil & Logros'),
+        title: const Text('Mi Perfil'),
         actions: [
           IconButton(
             tooltip: 'Editar Perfil y Metas',

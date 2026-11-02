@@ -33,51 +33,48 @@ class _MainScaffoldState extends State<MainScaffold> {
         ];
 
         return Scaffold(
+          backgroundColor: AppTheme.bgSand,
           body: IndexedStack(
             index: _currentIndex,
             children: screens,
           ),
           bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
-                ),
-              ],
+            decoration: const BoxDecoration(
+              color: AppTheme.bgSand,
+              border: Border(top: BorderSide(color: AppTheme.borderSubtle, width: 1)),
             ),
             child: NavigationBar(
+              backgroundColor: AppTheme.bgSand,
               selectedIndex: _currentIndex,
               onDestinationSelected: (index) {
                 setState(() => _currentIndex = index);
               },
-              indicatorColor: AppTheme.primary.withOpacity(0.15),
+              indicatorColor: AppTheme.primary.withOpacity(0.1),
               destinations: const [
                 NavigationDestination(
-                  icon: Icon(Icons.dashboard_outlined),
-                  selectedIcon: Icon(Icons.dashboard, color: AppTheme.primary),
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home, color: AppTheme.primary),
                   label: 'Inicio',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.checklist_outlined),
-                  selectedIcon: Icon(Icons.checklist, color: AppTheme.primary),
+                  icon: Icon(Icons.check_circle_outline),
+                  selectedIcon: Icon(Icons.check_circle, color: AppTheme.primary),
                   label: 'Tareas',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.calendar_month_outlined),
-                  selectedIcon: Icon(Icons.calendar_month, color: AppTheme.primary),
+                  icon: Icon(Icons.calendar_today_outlined),
+                  selectedIcon: Icon(Icons.calendar_today, color: AppTheme.primary),
                   label: 'Horario',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.favorite_border),
-                  selectedIcon: Icon(Icons.favorite, color: AppTheme.healthGreen),
-                  label: 'Salud',
+                  icon: Icon(Icons.spa_outlined),
+                  selectedIcon: Icon(Icons.spa, color: AppTheme.primary),
+                  label: 'Balance',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.emoji_events_outlined),
-                  selectedIcon: Icon(Icons.emoji_events, color: AppTheme.xpHoney),
-                  label: 'Logros',
+                  icon: Icon(Icons.person_outline),
+                  selectedIcon: Icon(Icons.person, color: AppTheme.primary),
+                  label: 'Perfil',
                 ),
               ],
             ),

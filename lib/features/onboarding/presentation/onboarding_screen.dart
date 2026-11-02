@@ -16,29 +16,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, String>> _pages = [
+  final List<Map<String, dynamic>> _pages = [
     {
-      'emoji': '🎓',
-      'title': 'Bienvenido a U-Pad',
-      'subtitle': 'La app creada por y para estudiantes. Organiza tus entregas, estudia con calma y cuida tus hábitos en un solo lugar.',
-      'badge': 'ORGANIZACIÓN SIN ESTRÉS',
+      'icon': Icons.balance_outlined,
+      'category': 'EQUILIBRIO UNIVERSITARIO',
+      'title': 'Estudio y bienestar en armonía',
+      'subtitle': 'Equilibra-U te ayuda a cumplir con tus materias sin descuidar tu descanso, hidratación y tiempo libre.',
     },
     {
-      'emoji': '⚡',
-      'title': 'Tu Canvas LMS Conectado',
-      'subtitle': 'Olvídate de anotar tareas a mano. Conecta tu cuenta universitaria y sincroniza entregas, quizzes y fechas límite en segundos.',
-      'badge': 'SINCRONIZACIÓN AUTOMÁTICA',
+      'icon': Icons.sync_alt_outlined,
+      'category': 'CANVAS LMS',
+      'title': 'Tus entregas siempre al día',
+      'subtitle': 'Conecta tu plataforma universitaria para importar tareas, fechas de examen y calificaciones automáticamente.',
     },
     {
-      'emoji': '🌿',
-      'title': 'Mente Sana, Mejores Notas',
-      'subtitle': 'Beber agua, dormir bien y moverte no es opcional. Registra tus hábitos, gana XP y mantén tus rachas activas.',
-      'badge': 'BIENESTAR Y GAMIFICACIÓN',
+      'icon': Icons.spa_outlined,
+      'category': 'HÁBITOS DIARIOS',
+      'title': 'Cuidar tu cuerpo es rendir mejor',
+      'subtitle': 'Registra tu agua, horas de sueño y bloques de concentración con un diseño pensado para darte paz mental.',
     },
   ];
 
   void _onFinish() {
-    widget.appState.awardXp(100, reason: 'Bienvenida a U-Pad completada');
+    widget.appState.awardXp(100, reason: 'Inicio en Equilibra-U');
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => MainScaffold(appState: widget.appState)),
     );
@@ -49,83 +49,97 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isLastPage = _currentPage == _pages.length - 1;
 
     return Scaffold(
-      backgroundColor: AppTheme.bgLight,
+      backgroundColor: AppTheme.bgSand,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 20.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Skip button
-              Align(
-                alignment: Alignment.topRight,
-                child: TextButton(
-                  onPressed: _onFinish,
-                  child: const Text(
-                    'Saltar',
-                    style: TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.bold),
+              // Top Bar with Brand and Skip
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Equilibra-U',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primary,
+                      letterSpacing: -0.5,
+                    ),
                   ),
-                ),
+                  TextButton(
+                    onPressed: _onFinish,
+                    child: const Text(
+                      'Omitir',
+                      style: TextStyle(
+                        color: AppTheme.textSub,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
-              // PageView
-              Expanded(
+              const Spacer(),
+
+              // Page View
+              SizedBox(
+                height: 380,
                 child: PageView.builder(
                   controller: _pageController,
-                  onPageChanged: (index) => setState(() => _currentPage = index),
+                  onPageChanged: (i) => setState(() => _currentPage = i),
                   itemCount: _pages.length,
                   itemBuilder: (context, index) {
                     final item = _pages[index];
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Floating Emoji Badge
+                        // Minimalist Icon Container
                         Container(
-                          width: 110,
-                          height: 110,
+                          width: 64,
+                          height: 64,
                           decoration: BoxDecoration(
-                            color: AppTheme.primary.withOpacity(0.12),
-                            shape: BoxShape.circle,
+                            color: AppTheme.surfaceCard,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppTheme.borderSubtle),
                           ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            item['emoji']!,
-                            style: const TextStyle(fontSize: 54),
+                          child: Icon(
+                            item['icon'] as IconData,
+                            size: 30,
+                            color: AppTheme.primary,
                           ),
                         ),
                         const SizedBox(height: 28),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppTheme.xpHoney.withOpacity(0.18),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            item['badge']!,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.primaryDark,
-                              letterSpacing: 0.8,
-                            ),
+                        Text(
+                          item['category'] as String,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
+                            color: AppTheme.accentRose,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 10),
                         Text(
-                          item['title']!,
-                          textAlign: TextAlign.center,
+                          item['title'] as String,
                           style: const TextStyle(
                             fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.textDark,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.textMain,
+                            height: 1.2,
+                            letterSpacing: -0.5,
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
                         Text(
-                          item['subtitle']!,
-                          textAlign: TextAlign.center,
+                          item['subtitle'] as String,
                           style: const TextStyle(
                             fontSize: 14,
-                            color: AppTheme.textMuted,
+                            color: AppTheme.textSub,
                             height: 1.5,
                           ),
                         ),
@@ -135,59 +149,56 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
 
-              // Page Indicators
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_pages.length, (index) {
-                  final isSelected = index == _currentPage;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: isSelected ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: isSelected ? AppTheme.primary : AppTheme.divider,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 32),
+              const Spacer(),
 
-              // Bottom Action Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size.fromHeight(52),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  elevation: 0,
-                ),
-                onPressed: () {
-                  if (isLastPage) {
-                    _onFinish();
-                  } else {
-                    _pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  }
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      isLastPage ? 'Comenzar mi Semestre (+100 XP) 🚀' : 'Continuar',
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              // Bottom Progress and Action
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Minimal Line Indicators
+                  Row(
+                    children: List.generate(_pages.length, (index) {
+                      final active = index == _currentPage;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.only(right: 6),
+                        width: active ? 22 : 6,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: active ? AppTheme.primary : AppTheme.borderSubtle,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      );
+                    }),
+                  ),
+                  // Forward / Start Button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                     ),
-                    if (!isLastPage) ...[
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward, size: 18),
-                    ],
-                  ],
-                ),
+                    onPressed: () {
+                      if (isLastPage) {
+                        _onFinish();
+                      } else {
+                        _pageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    },
+                    child: Text(
+                      isLastPage ? 'Comenzar' : 'Siguiente',
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
             ],
           ),
         ),

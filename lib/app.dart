@@ -16,11 +16,9 @@ class _UPadAppState extends State<UPadApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'U-Pad',
+      title: 'Equilibra-U',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
       home: OnboardingScreen(appState: _appState),
     );
   }

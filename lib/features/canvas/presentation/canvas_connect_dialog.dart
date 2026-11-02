@@ -54,9 +54,13 @@ class _CanvasConnectDialogState extends State<CanvasConnectDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: AppTheme.surfaceCard,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: AppTheme.borderSubtle),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(22.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,12 +68,12 @@ class _CanvasConnectDialogState extends State<CanvasConnectDialog> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppTheme.canvasRose.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12),
+                    color: AppTheme.canvasBrand.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.school, color: AppTheme.canvasRose, size: 28),
+                  child: const Icon(Icons.school_outlined, color: AppTheme.canvasBrand, size: 24),
                 ),
                 const SizedBox(width: 12),
                 const Expanded(
@@ -78,11 +82,11 @@ class _CanvasConnectDialogState extends State<CanvasConnectDialog> {
                     children: [
                       Text(
                         'Conectar Canvas LMS',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textMain),
                       ),
                       Text(
                         'Sincroniza tus cursos y entregas',
-                        style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                        style: TextStyle(fontSize: 12, color: AppTheme.textSub),
                       ),
                     ],
                   ),

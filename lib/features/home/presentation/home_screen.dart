@@ -18,9 +18,10 @@ class HomeScreen extends StatelessWidget {
         .toList();
 
     return Scaffold(
+      backgroundColor: AppTheme.bgSand,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -31,25 +32,32 @@ class HomeScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '¡Hola, ${appState.userStats.studentName}! 👋',
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'Nv. ${appState.userStats.currentLevel} • ${appState.userStats.levelTitle}',
-                        style: const TextStyle(
+                      const Text(
+                        'Equilibra-U',
+                        style: TextStyle(
                           fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.5,
                           color: AppTheme.primary,
-                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Buen día, ${appState.userStats.studentName.split(' ').first}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.textMain,
+                          letterSpacing: -0.5,
                         ),
                       ),
                     ],
                   ),
-                    Row(
+                  Row(
                     children: [
-                      // Pomodoro Quick Access Button
+                      // Pomodoro Quick Action
                       IconButton(
-                        tooltip: 'Modo Estudio Pomodoro',
+                        tooltip: 'Temporizador de Estudio',
                         icon: const Icon(Icons.timer_outlined, color: AppTheme.primary, size: 22),
                         onPressed: () {
                           Navigator.of(context).push(
@@ -59,44 +67,24 @@ class HomeScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      // Streak Badge
+                      // Level Badge
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: AppTheme.streakFire.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(20),
+                          color: AppTheme.surfaceCard,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppTheme.borderSubtle),
                         ),
                         child: Row(
                           children: [
-                            const Text('🔥', style: TextStyle(fontSize: 14)),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${appState.userStats.studyStreakDays}d',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.streakFire,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // XP Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppTheme.xpHoney.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.star, color: AppTheme.xpHoney, size: 16),
+                            const Icon(Icons.bolt, color: AppTheme.accentRose, size: 16),
                             const SizedBox(width: 4),
                             Text(
                               '${appState.userStats.currentXp} XP',
                               style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.xpHoney,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.textMain,
                               ),
                             ),
                           ],
@@ -106,38 +94,35 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
 
-              // Canvas Banner
+              // Canvas LMS Integration Card
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: appState.canvasService.isConnected
-                        ? [const Color(0xFF3D2C2A), const Color(0xFF2B1E1C)]
-                        : [AppTheme.canvasRose, AppTheme.primaryDark],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: AppTheme.surfaceCard,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.primary.withOpacity(0.25),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  border: Border.all(color: AppTheme.borderSubtle),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      width: 42,
+                      height: 42,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        shape: BoxShape.circle,
+                        color: appState.canvasService.isConnected
+                            ? AppTheme.primary.withOpacity(0.1)
+                            : AppTheme.canvasBrand.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.school, color: Colors.white, size: 28),
+                      child: Icon(
+                        Icons.school_outlined,
+                        color: appState.canvasService.isConnected
+                            ? AppTheme.primary
+                            : AppTheme.canvasBrand,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -146,169 +131,173 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Text(
                             appState.canvasService.isConnected
-                                ? 'Canvas LMS Conectado ✅'
-                                : 'Conecta tu Canvas Universitario',
+                                ? 'Canvas Sincronizado'
+                                : 'Conectar Canvas LMS',
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textMain,
                             ),
                           ),
-                          const SizedBox(height: 3),
+                          const SizedBox(height: 2),
                           Text(
                             appState.canvasService.isConnected
-                                ? 'Tareas y cursos sincronizados'
-                                : 'Trae tus entregas sin esfuerzo manual',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.85),
+                                ? 'Cursos y entregas al día'
+                                : 'Importa tus materias sin esfuerzo',
+                            style: const TextStyle(
                               fontSize: 12,
+                              color: AppTheme.textSub,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppTheme.primary,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: appState.canvasService.isConnected
+                              ? AppTheme.primary
+                              : AppTheme.canvasBrand,
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        foregroundColor: appState.canvasService.isConnected
+                            ? AppTheme.primary
+                            : AppTheme.canvasBrand,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        minimumSize: Size.zero,
                       ),
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (context) =>
-                              CanvasConnectDialog(appState: appState),
+                          builder: (context) => CanvasConnectDialog(appState: appState),
                         );
                       },
                       child: Text(
-                        appState.canvasService.isConnected ? 'Sincronizar' : 'Conectar',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                        appState.canvasService.isConnected ? 'Sincronizar' : 'Vincular',
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 22),
 
-              // Health Summary
+              const SizedBox(height: 24),
+
+              // Habits / Wellbeing Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('🌿 Tu Bienestar Hoy',
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Equilibrio Diario',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textMain,
+                    ),
+                  ),
                   Text(
-                    '${appState.healthMetrics.healthStreakDays} días en racha',
+                    '${appState.healthMetrics.healthStreakDays} días en balance',
                     style: const TextStyle(
                       fontSize: 12,
-                      color: AppTheme.healthGreen,
-                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textSub,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
+
               Row(
                 children: [
+                  // Water
                   Expanded(
-                    child: _buildHealthPill(
+                    child: _buildHealthCard(
                       context,
-                      title: 'Agua',
-                      value:
-                          '${appState.healthMetrics.waterGlassesCurrent}/${appState.healthMetrics.waterGlassesTarget}',
+                      icon: Icons.water_drop_outlined,
+                      label: 'Agua',
+                      value: '${appState.healthMetrics.waterGlassesCurrent}/${appState.healthMetrics.waterGlassesTarget}',
+                      unit: 'vasos',
                       progress: appState.healthMetrics.waterProgress,
-                      color: AppTheme.waterGreen,
-                      icon: Icons.water_drop,
+                      accentColor: AppTheme.healthWater,
                       onTap: () => appState.addWaterGlass(),
-                      actionLabel: '+1 Vaso',
+                      actionText: '+1',
                     ),
                   ),
                   const SizedBox(width: 10),
+                  // Sleep
                   Expanded(
-                    child: _buildHealthPill(
+                    child: _buildHealthCard(
                       context,
-                      title: 'Sueño',
-                      value: '${appState.healthMetrics.sleepHoursLastNight}h / 8h',
+                      icon: Icons.nights_stay_outlined,
+                      label: 'Sueño',
+                      value: '${appState.healthMetrics.sleepHoursLastNight}h',
+                      unit: 'de 8h meta',
                       progress: appState.healthMetrics.sleepProgress,
-                      color: AppTheme.sleepLavender,
-                      icon: Icons.nightlight_round,
-                      actionLabel: 'Registrar',
+                      accentColor: AppTheme.healthSleep,
                     ),
                   ),
                   const SizedBox(width: 10),
+                  // Exercise
                   Expanded(
-                    child: _buildHealthPill(
+                    child: _buildHealthCard(
                       context,
-                      title: 'Ejercicio',
-                      value:
-                          '${appState.healthMetrics.exerciseMinutesCurrent}m / 45m',
+                      icon: Icons.directions_run_outlined,
+                      label: 'Cuerpo',
+                      value: '${appState.healthMetrics.exerciseMinutesCurrent}m',
+                      unit: 'de 45m',
                       progress: appState.healthMetrics.exerciseProgress,
-                      color: AppTheme.exerciseAmber,
-                      icon: Icons.fitness_center,
+                      accentColor: AppTheme.healthActive,
                       onTap: () => appState.logExercise(15),
-                      actionLabel: '+15m',
+                      actionText: '+15m',
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+
+              const SizedBox(height: 26),
 
               // Urgent Tasks
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('⚡ Próximas Entregas',
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Próximas Entregas',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textMain,
+                    ),
+                  ),
                   Text(
                     '${urgentTasks.length} pendientes',
-                    style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                    style: const TextStyle(fontSize: 12, color: AppTheme.textSub),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
+
               if (urgentTasks.isEmpty)
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: AppTheme.healthGreen.withOpacity(0.08),
+                    color: AppTheme.surfaceCard,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.borderSubtle),
                   ),
                   child: const Center(
-                    child: Text('🎉 ¡Estás al día! No tienes entregas urgentes.'),
+                    child: Text(
+                      'Todas tus materias están al día.',
+                      style: TextStyle(color: AppTheme.textSub, fontSize: 13),
+                    ),
                   ),
                 )
               else
-                ...urgentTasks.map((task) => _buildTaskItem(context, task)).toList(),
+                ...urgentTasks.map((t) => _buildTaskRow(t)).toList(),
 
-              const SizedBox(height: 20),
-
-              // Motivational Quote
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.07),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.primary.withOpacity(0.2)),
-                ),
-                child: const Row(
-                  children: [
-                    Text('💡', style: TextStyle(fontSize: 24)),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        '"La disciplina es el puente entre tus metas universitarias y tus logros."',
-                        style: TextStyle(fontStyle: FontStyle.italic, fontSize: 13),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -316,22 +305,23 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHealthPill(
+  Widget _buildHealthCard(
     BuildContext context, {
-    required String title,
-    required String value,
-    required double progress,
-    required Color color,
     required IconData icon,
+    required String label,
+    required String value,
+    required String unit,
+    required double progress,
+    required Color accentColor,
     VoidCallback? onTap,
-    required String actionLabel,
+    String? actionText,
   }) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.divider),
+        color: AppTheme.surfaceCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.borderSubtle),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,76 +329,83 @@ class HomeScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, color: color, size: 20),
-              Text(
-                '${(progress * 100).toInt()}%',
-                style: TextStyle(
-                    fontSize: 11, fontWeight: FontWeight.bold, color: color),
-              ),
+              Icon(icon, size: 18, color: accentColor),
+              if (onTap != null && actionText != null)
+                GestureDetector(
+                  onTap: onTap,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: accentColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      actionText,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: accentColor,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(title,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-          Text(value,
-              style: const TextStyle(fontSize: 11, color: AppTheme.textMuted)),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              color: color,
-              backgroundColor: color.withOpacity(0.15),
-              minHeight: 5,
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textMain,
             ),
           ),
+          Text(
+            unit,
+            style: const TextStyle(fontSize: 11, color: AppTheme.textSub),
+          ),
           const SizedBox(height: 8),
-          if (onTap != null)
-            GestureDetector(
-              onTap: onTap,
-              child: Container(
-                width: double.infinity,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  actionLabel,
-                  style: TextStyle(
-                      fontSize: 11, fontWeight: FontWeight.bold, color: color),
-                ),
-              ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: AppTheme.borderSubtle.withOpacity(0.5),
+              valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+              minHeight: 3.5,
             ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTaskItem(BuildContext context, TaskModel task) {
+  Widget _buildTaskRow(TaskModel task) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.divider),
+        color: AppTheme.surfaceCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.borderSubtle),
       ),
       child: Row(
         children: [
           IconButton(
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
             icon: Icon(
               task.status == TaskStatus.completada
                   ? Icons.check_circle
                   : Icons.radio_button_unchecked,
               color: task.status == TaskStatus.completada
-                  ? AppTheme.healthGreen
-                  : AppTheme.textMuted,
+                  ? AppTheme.primary
+                  : AppTheme.textSub,
+              size: 20,
             ),
             onPressed: () => appState.toggleTaskStatus(task),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,27 +415,28 @@ class HomeScreen extends StatelessWidget {
                     if (task.isFromCanvas)
                       Container(
                         margin: const EdgeInsets.only(right: 6),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                         decoration: BoxDecoration(
-                          color: AppTheme.canvasRose.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(6),
+                          color: AppTheme.canvasBrand.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
                           'CANVAS',
                           style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.canvasRose),
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.canvasBrand,
+                          ),
                         ),
                       ),
                     Expanded(
                       child: Text(
                         task.courseName,
                         style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.primary),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textSub,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -449,37 +447,23 @@ class HomeScreen extends StatelessWidget {
                   task.title,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textDark,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textMain,
                     decoration: task.status == TaskStatus.completada
                         ? TextDecoration.lineThrough
                         : null,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.timer_outlined,
-                        size: 12, color: AppTheme.streakFire),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Faltan ${task.daysRemaining}d',
-                      style: const TextStyle(
-                          fontSize: 11,
-                          color: AppTheme.streakFire,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      '+${task.xpReward} XP',
-                      style: const TextStyle(
-                          fontSize: 11,
-                          color: AppTheme.xpHoney,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
               ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${task.daysRemaining}d',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.accentRose,
             ),
           ),
         ],

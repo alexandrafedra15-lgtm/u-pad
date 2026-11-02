@@ -29,28 +29,28 @@ class _TasksScreenState extends State<TasksScreen> {
     }
 
     return Scaffold(
+      backgroundColor: AppTheme.bgSand,
       appBar: AppBar(
-        title: const Text('📋 Tareas & Deadlines'),
+        title: const Text('Entregas y Tareas'),
         actions: [
           IconButton(
             tooltip: 'Sincronizar Canvas',
-            icon: const Icon(Icons.sync, color: AppTheme.canvasRose),
+            icon: const Icon(Icons.sync, color: AppTheme.primary, size: 22),
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (context) =>
-                    CanvasConnectDialog(appState: widget.appState),
+                builder: (context) => CanvasConnectDialog(appState: widget.appState),
               );
             },
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         backgroundColor: AppTheme.primary,
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.add),
-        label: const Text('Nueva Tarea'),
+        elevation: 2,
         onPressed: () => _showAddTaskDialog(context),
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [
@@ -67,23 +67,13 @@ class _TasksScreenState extends State<TasksScreen> {
               ],
             ),
           ),
-          const Divider(height: 1),
+          const Divider(height: 1, color: AppTheme.borderSubtle),
           Expanded(
             child: filteredTasks.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.assignment_turned_in_outlined,
-                            size: 64,
-                            color: AppTheme.healthGreen.withOpacity(0.4)),
-                        const SizedBox(height: 12),
-                        const Text(
-                          '¡Al día! No hay tareas aquí.',
-                          style: TextStyle(
-                              color: AppTheme.textMuted, fontSize: 16),
-                        ),
-                      ],
+                ? const Center(
+                    child: Text(
+                      'No hay tareas pendientes en esta vista.',
+                      style: TextStyle(color: AppTheme.textSub, fontSize: 14),
                     ),
                   )
                 : ListView.builder(
@@ -105,10 +95,13 @@ class _TasksScreenState extends State<TasksScreen> {
       child: ChoiceChip(
         label: Text(label),
         selected: isSelected,
-        selectedColor: AppTheme.primary.withOpacity(0.15),
+        selectedColor: AppTheme.surfaceCard,
+        backgroundColor: Colors.transparent,
+        side: BorderSide(color: isSelected ? AppTheme.primary : AppTheme.borderSubtle),
         labelStyle: TextStyle(
-          color: isSelected ? AppTheme.primary : AppTheme.textMuted,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? AppTheme.primary : AppTheme.textSub,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          fontSize: 12,
         ),
         onSelected: (val) {
           if (val) setState(() => _selectedFilter = label);
@@ -118,137 +111,90 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   Widget _buildTaskCard(TaskModel task) {
-    Color priorityColor;
-    switch (task.priority) {
-      case TaskPriority.alta:
-        priorityColor = AppTheme.canvasRose;
-        break;
-      case TaskPriority.media:
-        priorityColor = AppTheme.xpHoney;
-        break;
-      case TaskPriority.baja:
-        priorityColor = AppTheme.healthGreen;
-        break;
-    }
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                if (task.isFromCanvas)
-                  Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppTheme.canvasRose.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.school, size: 12, color: AppTheme.canvasRose),
-                        SizedBox(width: 4),
-                        Text('CANVAS',
-                            style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.canvasRose)),
-                      ],
-                    ),
-                  ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (task.isFromCanvas)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  margin: const EdgeInsets.only(right: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: priorityColor.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(6),
+                    color: AppTheme.canvasBrand.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text(
-                    task.priority.name.toUpperCase(),
+                  child: const Text(
+                    'CANVAS',
                     style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: priorityColor),
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.canvasBrand,
+                    ),
                   ),
                 ),
-                const Spacer(),
-                Text(
-                  '+${task.xpReward} XP',
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.xpHoney),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              task.title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                decoration: task.status == TaskStatus.completada
-                    ? TextDecoration.lineThrough
-                    : null,
-              ),
-            ),
-            if (task.description.isNotEmpty) ...[
-              const SizedBox(height: 4),
               Text(
-                task.description,
-                style:
-                    const TextStyle(fontSize: 13, color: AppTheme.textMuted),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                task.courseName,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textSub,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${task.daysRemaining}d restantes',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.accentRose,
+                ),
               ),
             ],
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Icon(Icons.book_outlined,
-                    size: 14, color: AppTheme.primary),
-                const SizedBox(width: 4),
-                Text(
-                  task.courseName,
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.primary),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: Icon(
+                  task.status == TaskStatus.completada
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  color: task.status == TaskStatus.completada
+                      ? AppTheme.primary
+                      : AppTheme.textSub,
+                  size: 20,
                 ),
-                const Spacer(),
-                const Icon(Icons.event_outlined,
-                    size: 14, color: AppTheme.streakFire),
-                const SizedBox(width: 4),
-                Text(
-                  'Faltan ${task.daysRemaining}d',
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.streakFire),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  visualDensity: VisualDensity.compact,
-                  icon: Icon(
-                    task.status == TaskStatus.completada
-                        ? Icons.check_circle
-                        : Icons.radio_button_unchecked,
-                    color: task.status == TaskStatus.completada
-                        ? AppTheme.healthGreen
-                        : AppTheme.textMuted,
+                onPressed: () => widget.appState.toggleTaskStatus(task),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  task.title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textMain,
+                    decoration: task.status == TaskStatus.completada
+                        ? TextDecoration.lineThrough
+                        : null,
                   ),
-                  onPressed: () => widget.appState.toggleTaskStatus(task),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -256,13 +202,14 @@ class _TasksScreenState extends State<TasksScreen> {
   void _showAddTaskDialog(BuildContext context) {
     final titleController = TextEditingController();
     final courseController = TextEditingController();
-    final descController = TextEditingController();
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: AppTheme.surfaceCard,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
         return Padding(
           padding: EdgeInsets.only(
@@ -275,32 +222,23 @@ class _TasksScreenState extends State<TasksScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Nueva Tarea Manual',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text(
+                'Nueva Entrega',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+              ),
               const SizedBox(height: 14),
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(
-                    labelText: 'Título de la tarea o entrega'),
+                decoration: const InputDecoration(labelText: 'Título'),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: courseController,
-                decoration:
-                    const InputDecoration(labelText: 'Materia / Curso'),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: descController,
-                maxLines: 2,
-                decoration: const InputDecoration(
-                    labelText: 'Descripción / Notas (opcional)'),
+                decoration: const InputDecoration(labelText: 'Materia / Curso'),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                ),
+                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
                 onPressed: () {
                   if (titleController.text.trim().isNotEmpty) {
                     widget.appState.addTask(
@@ -310,18 +248,15 @@ class _TasksScreenState extends State<TasksScreen> {
                         courseName: courseController.text.trim().isEmpty
                             ? 'General'
                             : courseController.text.trim(),
-                        description: descController.text.trim(),
-                        dueDate:
-                            DateTime.now().add(const Duration(days: 3)),
+                        dueDate: DateTime.now().add(const Duration(days: 3)),
                         priority: TaskPriority.media,
                       ),
                     );
                     Navigator.of(context).pop();
                   }
                 },
-                child: const Text('Guardar Tarea'),
+                child: const Text('Guardar'),
               ),
-              const SizedBox(height: 8),
             ],
           ),
         );

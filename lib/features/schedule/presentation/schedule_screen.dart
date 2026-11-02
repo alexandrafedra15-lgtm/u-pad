@@ -23,8 +23,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         .toList();
 
     return Scaffold(
+      backgroundColor: AppTheme.bgSand,
       appBar: AppBar(
-        title: const Text('📅 Horario & Bloques'),
+        title: const Text('Horario Semanal'),
         actions: [
           IconButton(
             tooltip: 'Añadir clase o bloque',
