@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// Psicología aplicada: calor humano, antiestrés, recompensa y cero fatiga visual.
 class AppTheme {
   // ─── Primario: Terracota Suave — Motivación cálida, sin ansiedad ───────────
-  static const Color primary     = Color(0xFFE07A5F); // Terracota suave
+  static const Color primary      = Color(0xFFE07A5F); // Terracota suave
   static const Color primaryLight = Color(0xFFEB9F8A); // Melocotón claro
   static const Color primaryDark  = Color(0xFFC45E44); // Terracota profundo
 
@@ -44,12 +44,9 @@ class AppTheme {
         secondary: healthGreen,
         tertiary: xpHoney,
         surface: cardLight,
-        background: bgLight,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
         error: canvasRose,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: cardLight,
         elevation: 0,
         shadowColor: Colors.transparent,
@@ -67,15 +64,14 @@ class AppTheme {
           color: textDark,
           fontSize: 20,
           fontWeight: FontWeight.bold,
-          fontFamily: 'sans-serif',
         ),
         iconTheme: IconThemeData(color: textDark),
       ),
-      navigationBarTheme: const NavigationBarThemeData(
+      navigationBarTheme: NavigationBarThemeData(
         backgroundColor: cardLight,
-        indicatorColor: Color(0xFFF5DDD6), // Terracota muy suave
-        labelTextStyle: WidgetStatePropertyOrValue.withValue(
-          TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+        indicatorColor: const Color(0xFFF5DDD6), // Terracota muy suave
+        labelTextStyle: WidgetStateProperty.all(
+          const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -116,11 +112,9 @@ class AppTheme {
         secondary: healthGreen,
         tertiary: xpHoney,
         surface: cardDark,
-        background: bgDark,
-        onPrimary: Colors.white,
         error: canvasRose,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: cardDark,
         elevation: 0,
         shadowColor: Colors.transparent,
@@ -144,8 +138,8 @@ class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: cardDark,
         indicatorColor: primary.withOpacity(0.25),
-        labelTextStyle: const WidgetStatePropertyOrValue.withValue(
-          TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+        labelTextStyle: WidgetStateProperty.all(
+          const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(

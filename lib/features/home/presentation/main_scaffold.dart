@@ -71,12 +71,12 @@ class _MainScaffoldState extends State<MainScaffold> {
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.favorite_border),
-                  selectedIcon: Icon(Icons.favorite, color: AppTheme.healthMint),
+                  selectedIcon: Icon(Icons.favorite, color: AppTheme.healthGreen),
                   label: 'Salud',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.emoji_events_outlined),
-                  selectedIcon: Icon(Icons.emoji_events, color: AppTheme.xpGold),
+                  selectedIcon: Icon(Icons.emoji_events, color: AppTheme.xpHoney),
                   label: 'Logros',
                 ),
               ],
