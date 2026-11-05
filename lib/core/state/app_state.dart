@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/animated_widgets.dart';
 import '../../features/tasks/models/task_model.dart';
 import '../../features/canvas/services/canvas_service.dart';
 import '../../features/health/models/health_metrics.dart';
@@ -123,8 +124,10 @@ class AppState extends ChangeNotifier {
   void toggleTaskStatus(TaskModel task) {
     if (task.status == TaskStatus.completada) {
       task.status = TaskStatus.pendiente;
+      AppHaptics.light();
     } else {
       task.status = TaskStatus.completada;
+      AppHaptics.medium();
       awardXp(task.xpReward, reason: 'Tarea completada: ${task.title}');
     }
     notifyListeners();
@@ -135,12 +138,14 @@ class AppState extends ChangeNotifier {
     scheduleBlocks.add(block);
     // Sort by start time
     scheduleBlocks.sort((a, b) => a.startTime.compareTo(b.startTime));
+    AppHaptics.medium();
     awardXp(25, reason: 'Nuevo bloque en el horario');
     notifyListeners();
   }
 
   void deleteScheduleBlock(String id) {
     scheduleBlocks.removeWhere((b) => b.id == id);
+    AppHaptics.light();
     notifyListeners();
   }
 
@@ -148,6 +153,7 @@ class AppState extends ChangeNotifier {
   void addWaterGlass() {
     if (healthMetrics.waterGlassesCurrent < 15) {
       healthMetrics.waterGlassesCurrent += 1;
+      AppHaptics.light();
       awardXp(15, reason: 'Hidratación');
       notifyListeners();
     }
@@ -155,6 +161,7 @@ class AppState extends ChangeNotifier {
 
   void logExercise(int minutes) {
     healthMetrics.exerciseMinutesCurrent += minutes;
+    AppHaptics.medium();
     awardXp(25, reason: 'Ejercicio físico');
     notifyListeners();
   }
@@ -167,6 +174,7 @@ class AppState extends ChangeNotifier {
   // Gamification Actions
   void awardXp(int amount, {String? reason}) {
     userStats.currentXp += amount;
+    AppHaptics.success();
     notifyListeners();
   }
 

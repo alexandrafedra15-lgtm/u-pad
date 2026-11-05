@@ -1,6 +1,43 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
+
+/// Utilidades de feedback háptico sutil y orgánico
+class AppHaptics {
+  static void light() {
+    try {
+      HapticFeedback.lightImpact();
+    } catch (_) {}
+  }
+
+  static void medium() {
+    try {
+      HapticFeedback.mediumImpact();
+    } catch (_) {}
+  }
+
+  static void heavy() {
+    try {
+      HapticFeedback.heavyImpact();
+    } catch (_) {}
+  }
+
+  static void success() {
+    try {
+      HapticFeedback.mediumImpact();
+      Future.delayed(const Duration(milliseconds: 90), () {
+        HapticFeedback.lightImpact();
+      });
+    } catch (_) {}
+  }
+
+  static void selection() {
+    try {
+      HapticFeedback.selectionClick();
+    } catch (_) {}
+  }
+}
 
 /// Tarjeta que aparece con un fade + slide suave al construirse
 class FadeSlideIn extends StatefulWidget {
@@ -143,12 +180,14 @@ class BounceTap extends StatefulWidget {
   final Widget child;
   final VoidCallback? onTap;
   final double scaleFactor;
+  final bool enableHaptic;
 
   const BounceTap({
     Key? key,
     required this.child,
     this.onTap,
     this.scaleFactor = 0.93,
+    this.enableHaptic = true,
   }) : super(key: key);
 
   @override
@@ -182,7 +221,10 @@ class _BounceTapState extends State<BounceTap>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => _ctrl.forward(),
+      onTapDown: (_) {
+        if (widget.enableHaptic) AppHaptics.light();
+        _ctrl.forward();
+      },
       onTapUp: (_) {
         _ctrl.reverse();
         widget.onTap?.call();
