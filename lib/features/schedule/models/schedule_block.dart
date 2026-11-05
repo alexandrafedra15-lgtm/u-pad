@@ -35,4 +35,30 @@ class ScheduleBlock {
         return 'Pausa y Almuerzo';
     }
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'dayIndex': dayIndex,
+      'title': title,
+      'location': location,
+      'startTime': startTime,
+      'endTime': endTime,
+      'type': type.index,
+      'color': color.value,
+    };
+  }
+
+  factory ScheduleBlock.fromJson(Map<String, dynamic> json) {
+    return ScheduleBlock(
+      id: json['id'] as String,
+      dayIndex: json['dayIndex'] as int,
+      title: json['title'] as String,
+      location: json['location'] as String? ?? '',
+      startTime: json['startTime'] as String,
+      endTime: json['endTime'] as String,
+      type: ScheduleType.values[json['type'] as int? ?? 0],
+      color: Color(json['color'] as int),
+    );
+  }
 }

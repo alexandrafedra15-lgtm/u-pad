@@ -34,4 +34,34 @@ class TaskModel {
     final difference = dueDate.difference(now);
     return difference.inDays;
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'courseName': courseName,
+      'dueDate': dueDate.toIso8601String(),
+      'priority': priority.index,
+      'status': status.index,
+      'isFromCanvas': isFromCanvas,
+      'canvasUrl': canvasUrl,
+      'xpReward': xpReward,
+    };
+  }
+
+  factory TaskModel.fromJson(Map<String, dynamic> json) {
+    return TaskModel(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String? ?? '',
+      courseName: json['courseName'] as String,
+      dueDate: DateTime.parse(json['dueDate'] as String),
+      priority: TaskPriority.values[json['priority'] as int? ?? 1],
+      status: TaskStatus.values[json['status'] as int? ?? 0],
+      isFromCanvas: json['isFromCanvas'] as bool? ?? false,
+      canvasUrl: json['canvasUrl'] as String?,
+      xpReward: json['xpReward'] as int? ?? 50,
+    );
+  }
 }

@@ -64,6 +64,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   }
 
   void _onFinish() {
+    widget.appState.storage.setOnboardingDone(true);
     widget.appState.awardXp(100, reason: 'Inicio en Equilibra-U');
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(

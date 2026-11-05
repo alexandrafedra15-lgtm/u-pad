@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/animated_widgets.dart';
+import '../services/storage_service.dart';
 import '../../features/tasks/models/task_model.dart';
 import '../../features/canvas/services/canvas_service.dart';
 import '../../features/health/models/health_metrics.dart';
@@ -9,17 +10,37 @@ import '../theme/app_theme.dart';
 
 class AppState extends ChangeNotifier {
   final CanvasService canvasService = CanvasService();
+  final StorageService storage = StorageService();
   late HealthMetrics healthMetrics;
   late UserStats userStats;
   List<TaskModel> tasks = [];
   List<ScheduleBlock> scheduleBlocks = [];
   bool isSyncingCanvas = false;
+  bool isInitialized = false;
 
   AppState() {
     healthMetrics = HealthMetrics();
     userStats = UserStats(achievements: UserStats.initialAchievements);
     _initializeDefaultTasks();
     _initializeDefaultSchedule();
+    initPersistence();
+  }
+
+  Future<void> initPersistence() async {
+    try {
+      await storage.loadUserStats(userStats);
+      await storage.loadHealthMetrics(healthMetrics);
+      final savedTasks = await storage.loadTasks();
+      if (savedTasks != null && savedTasks.isNotEmpty) {
+        tasks = savedTasks;
+      }
+      final savedSchedule = await storage.loadSchedule();
+      if (savedSchedule != null && savedSchedule.isNotEmpty) {
+        scheduleBlocks = savedSchedule;
+      }
+      isInitialized = true;
+      notifyListeners();
+    } catch (_) {}
   }
 
   void _initializeDefaultSchedule() {
@@ -118,6 +139,7 @@ class AppState extends ChangeNotifier {
   // Task Actions
   void addTask(TaskModel task) {
     tasks.insert(0, task);
+    storage.saveTasks(tasks);
     notifyListeners();
   }
 
@@ -130,6 +152,7 @@ class AppState extends ChangeNotifier {
       AppHaptics.medium();
       awardXp(task.xpReward, reason: 'Tarea completada: ${task.title}');
     }
+    storage.saveTasks(tasks);
     notifyListeners();
   }
 
@@ -140,12 +163,14 @@ class AppState extends ChangeNotifier {
     scheduleBlocks.sort((a, b) => a.startTime.compareTo(b.startTime));
     AppHaptics.medium();
     awardXp(25, reason: 'Nuevo bloque en el horario');
+    storage.saveSchedule(scheduleBlocks);
     notifyListeners();
   }
 
   void deleteScheduleBlock(String id) {
     scheduleBlocks.removeWhere((b) => b.id == id);
     AppHaptics.light();
+    storage.saveSchedule(scheduleBlocks);
     notifyListeners();
   }
 
@@ -155,6 +180,7 @@ class AppState extends ChangeNotifier {
       healthMetrics.waterGlassesCurrent += 1;
       AppHaptics.light();
       awardXp(15, reason: 'Hidratación');
+      storage.saveHealthMetrics(healthMetrics);
       notifyListeners();
     }
   }
@@ -163,11 +189,13 @@ class AppState extends ChangeNotifier {
     healthMetrics.exerciseMinutesCurrent += minutes;
     AppHaptics.medium();
     awardXp(25, reason: 'Ejercicio físico');
+    storage.saveHealthMetrics(healthMetrics);
     notifyListeners();
   }
 
   void updateSleep(double hours) {
     healthMetrics.sleepHoursLastNight = hours;
+    storage.saveHealthMetrics(healthMetrics);
     notifyListeners();
   }
 
@@ -175,6 +203,7 @@ class AppState extends ChangeNotifier {
   void awardXp(int amount, {String? reason}) {
     userStats.currentXp += amount;
     AppHaptics.success();
+    storage.saveUserStats(userStats);
     notifyListeners();
   }
 
@@ -195,6 +224,8 @@ class AppState extends ChangeNotifier {
     healthMetrics.sleepHoursTarget = sleepTarget;
 
     awardXp(30, reason: 'Perfil de estudiante actualizado');
+    storage.saveUserStats(userStats);
+    storage.saveHealthMetrics(healthMetrics);
     notifyListeners();
   }
 }

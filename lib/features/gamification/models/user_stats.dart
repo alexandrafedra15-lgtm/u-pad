@@ -3,7 +3,7 @@ class UserAchievement {
   final String title;
   final String description;
   final String icon;
-  final bool isUnlocked;
+  bool isUnlocked;
 
   UserAchievement({
     required this.id,
