@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -23,6 +24,7 @@ class _FadeSlideInState extends State<FadeSlideIn>
   late AnimationController _ctrl;
   late Animation<double> _opacity;
   late Animation<Offset> _slide;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -37,13 +39,18 @@ class _FadeSlideInState extends State<FadeSlideIn>
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
 
-    Future.delayed(widget.delay, () {
-      if (mounted) _ctrl.forward();
-    });
+    if (widget.delay == Duration.zero) {
+      _ctrl.forward();
+    } else {
+      _timer = Timer(widget.delay, () {
+        if (mounted) _ctrl.forward();
+      });
+    }
   }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _ctrl.dispose();
     super.dispose();
   }

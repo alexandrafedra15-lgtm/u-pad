@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/state/app_state.dart';
+import '../../../core/widgets/animated_widgets.dart';
 
 enum PomodoroMode { focus, shortBreak, longBreak }
 
@@ -14,12 +15,18 @@ class PomodoroScreen extends StatefulWidget {
   State<PomodoroScreen> createState() => _PomodoroScreenState();
 }
 
-class _PomodoroScreenState extends State<PomodoroScreen> {
+class _PomodoroScreenState extends State<PomodoroScreen>
+    with TickerProviderStateMixin {
   PomodoroMode _mode = PomodoroMode.focus;
   Timer? _timer;
   int _secondsLeft = 25 * 60;
   bool _isRunning = false;
   String _selectedCourse = 'General';
+
+  late AnimationController _playPulseCtrl;
+  late Animation<double> _playPulse;
+  late AnimationController _modeColorCtrl;
+  late Animation<Color?> _modeColorAnim;
 
   final Map<PomodoroMode, int> _durations = {
     PomodoroMode.focus: 25 * 60,
@@ -27,33 +34,73 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
     PomodoroMode.longBreak: 15 * 60,
   };
 
+  Color get _themeColor =>
+      _mode == PomodoroMode.focus ? AppTheme.primary : AppTheme.healthGreen;
+
+  @override
+  void initState() {
+    super.initState();
+    _playPulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+    _playPulse = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _playPulseCtrl, curve: Curves.easeInOut),
+    );
+
+    _modeColorCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _modeColorAnim = ColorTween(
+      begin: AppTheme.primary,
+      end: AppTheme.primary,
+    ).animate(_modeColorCtrl);
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
+    _playPulseCtrl.dispose();
+    _modeColorCtrl.dispose();
     super.dispose();
   }
 
   void _switchMode(PomodoroMode mode) {
+    final prevColor = _themeColor;
     _timer?.cancel();
     setState(() {
       _mode = mode;
       _secondsLeft = _durations[mode]!;
       _isRunning = false;
     });
+    final nextColor = _themeColor;
+    _modeColorAnim = ColorTween(begin: prevColor, end: nextColor)
+        .animate(CurvedAnimation(parent: _modeColorCtrl, curve: Curves.easeOut));
+    _modeColorCtrl.forward(from: 0);
+    if (_isRunning) {
+      _playPulseCtrl.stop();
+    } else {
+      _playPulseCtrl.repeat(reverse: true);
+    }
   }
 
   void _toggleTimer() {
     if (_isRunning) {
       _timer?.cancel();
       setState(() => _isRunning = false);
+      _playPulseCtrl.repeat(reverse: true);
     } else {
       setState(() => _isRunning = true);
+      _playPulseCtrl.stop();
+      _playPulseCtrl.value = 1.0;
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (_secondsLeft > 0) {
           setState(() => _secondsLeft--);
         } else {
           _timer?.cancel();
           _isRunning = false;
+          _playPulseCtrl.repeat(reverse: true);
           _handleSessionCompleted();
         }
       });
@@ -64,14 +111,15 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
     if (_mode == PomodoroMode.focus) {
       widget.appState.awardXp(50, reason: 'Sesión Pomodoro: $_selectedCourse');
       _showCompletionDialog(
-        title: '¡Sesión de Estudio Completada! 🎉',
-        message: '¡Excelente concentración! Ganaste +50 XP.\nTómate 5 minutos de pausa activa para estirar y tomar agua.',
+        title: '¡Sesión de Estudio Completada!',
+        message:
+            '¡Excelente concentración! Ganaste +50 XP.\nTómate 5 minutos de pausa activa.',
         nextMode: PomodoroMode.shortBreak,
       );
     } else {
       _showCompletionDialog(
-        title: '¡Descanso terminado! ☕',
-        message: 'Tu mente está recargada y lista para otro bloque de estudio.',
+        title: '¡Descanso terminado!',
+        message: 'Tu mente está recargada. Listo para otro bloque de estudio.',
         nextMode: PomodoroMode.focus,
       );
     }
@@ -86,7 +134,8 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(title,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,6 +179,7 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
       _secondsLeft = _durations[_mode]!;
       _isRunning = false;
     });
+    _playPulseCtrl.repeat(reverse: true);
   }
 
   String _formatTime(int totalSeconds) {
@@ -142,9 +192,6 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
   Widget build(BuildContext context) {
     final totalSeconds = _durations[_mode]!;
     final progress = (_secondsLeft / totalSeconds).clamp(0.0, 1.0);
-    final themeColor = _mode == PomodoroMode.focus
-        ? AppTheme.primary
-        : AppTheme.healthGreen;
 
     return Scaffold(
       backgroundColor: AppTheme.bgSand,
@@ -157,150 +204,215 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
           child: Column(
             children: [
               // Mode Selector Tabs
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    _buildModeTab('Enfoque (25m)', PomodoroMode.focus),
-                    _buildModeTab('Descanso (5m)', PomodoroMode.shortBreak),
-                    _buildModeTab('Pausa (15m)', PomodoroMode.longBreak),
-                  ],
+              FadeSlideIn(
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      _buildModeTab('Enfoque (25m)', PomodoroMode.focus),
+                      _buildModeTab('Descanso (5m)', PomodoroMode.shortBreak),
+                      _buildModeTab('Pausa (15m)', PomodoroMode.longBreak),
+                    ],
+                  ),
                 ),
               ),
 
               const SizedBox(height: 24),
 
               // Course Selector Tag
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.book_outlined, size: 16, color: AppTheme.textMuted),
-                  const SizedBox(width: 6),
-                  const Text('Estudiando:', style: TextStyle(color: AppTheme.textMuted, fontSize: 13)),
-                  const SizedBox(width: 8),
-                  DropdownButton<String>(
-                    value: _selectedCourse,
-                    underline: const SizedBox(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.primary,
-                      fontSize: 14,
+              FadeSlideIn(
+                delay: const Duration(milliseconds: 80),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.book_outlined,
+                        size: 16, color: AppTheme.textMuted),
+                    const SizedBox(width: 6),
+                    const Text('Estudiando:',
+                        style:
+                            TextStyle(color: AppTheme.textMuted, fontSize: 13)),
+                    const SizedBox(width: 8),
+                    DropdownButton<String>(
+                      value: _selectedCourse,
+                      underline: const SizedBox(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primary,
+                        fontSize: 14,
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                            value: 'General', child: Text('General / Tareas')),
+                        DropdownMenuItem(
+                            value: 'CS-201',
+                            child: Text('CS-201: Algoritmos')),
+                        DropdownMenuItem(
+                            value: 'MAT-301', child: Text('MAT-301: Cálculo')),
+                        DropdownMenuItem(
+                            value: 'FIS-102', child: Text('FIS-102: Física')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setState(() => _selectedCourse = val);
+                      },
                     ),
-                    items: const [
-                      DropdownMenuItem(value: 'General', child: Text('General / Tareas')),
-                      DropdownMenuItem(value: 'CS-201', child: Text('CS-201: Algoritmos')),
-                      DropdownMenuItem(value: 'MAT-301', child: Text('MAT-301: Cálculo')),
-                      DropdownMenuItem(value: 'FIS-102', child: Text('FIS-102: Física')),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) setState(() => _selectedCourse = val);
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
 
               const Spacer(),
 
-              // Circular Timer Display
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 240,
-                    height: 240,
-                    child: CircularProgressIndicator(
-                      value: progress,
-                      strokeWidth: 12,
-                      backgroundColor: themeColor.withOpacity(0.15),
-                      valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                      strokeCap: StrokeCap.round,
-                    ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _formatTime(_secondsLeft),
-                        style: TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: themeColor,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        _mode == PomodoroMode.focus
-                            ? 'TIEMPO DE FOCO'
-                            : 'PAUSA ACTIVA',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textMuted,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      if (_mode == PomodoroMode.focus) ...[
-                        const SizedBox(height: 4),
-                        const Text(
-                          '+50 XP al completar',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppTheme.xpHoney,
-                            fontWeight: FontWeight.w600,
+              // Circular Timer
+              FadeSlideIn(
+                delay: const Duration(milliseconds: 160),
+                child: AnimatedBuilder(
+                  animation: _modeColorAnim,
+                  builder: (context, _) {
+                    final color = _modeColorAnim.value ?? _themeColor;
+                    return Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Soft glow ring
+                        Container(
+                          width: 260,
+                          height: 260,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: color.withOpacity(0.06),
                           ),
                         ),
+                        SizedBox(
+                          width: 220,
+                          height: 220,
+                          child: CircularProgressIndicator(
+                            value: progress,
+                            strokeWidth: 10,
+                            backgroundColor: color.withOpacity(0.12),
+                            valueColor: AlwaysStoppedAnimation<Color>(color),
+                            strokeCap: StrokeCap.round,
+                          ),
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              child: Text(
+                                _formatTime(_secondsLeft),
+                                key: ValueKey(_secondsLeft ~/ 60),
+                                style: TextStyle(
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.bold,
+                                  color: color,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 400),
+                              transitionBuilder: (child, anim) =>
+                                  FadeTransition(opacity: anim, child: child),
+                              child: Text(
+                                _mode == PomodoroMode.focus
+                                    ? 'TIEMPO DE FOCO'
+                                    : 'PAUSA ACTIVA',
+                                key: ValueKey(_mode),
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.textMuted,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ),
+                            if (_mode == PomodoroMode.focus) ...[
+                              const SizedBox(height: 4),
+                              const Text(
+                                '+50 XP al completar',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppTheme.xpHoney,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ],
-                    ],
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
 
               const Spacer(),
 
-              // Controls: Start/Pause and Reset
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    iconSize: 32,
-                    color: AppTheme.textMuted,
-                    icon: const Icon(Icons.refresh),
-                    tooltip: 'Reiniciar',
-                    onPressed: _resetTimer,
-                  ),
-                  const SizedBox(width: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: themeColor,
-                      foregroundColor: Colors.white,
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(22),
-                      elevation: 4,
-                      shadowColor: themeColor.withOpacity(0.4),
+              // Controls
+              FadeSlideIn(
+                delay: const Duration(milliseconds: 240),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      iconSize: 28,
+                      color: AppTheme.textMuted,
+                      icon: const Icon(Icons.refresh),
+                      tooltip: 'Reiniciar',
+                      onPressed: _resetTimer,
                     ),
-                    onPressed: _toggleTimer,
-                    child: Icon(
-                      _isRunning ? Icons.pause : Icons.play_arrow,
-                      size: 36,
+                    const SizedBox(width: 24),
+                    // Animated play/pause button
+                    AnimatedBuilder(
+                      animation: _playPulse,
+                      builder: (context, child) => Transform.scale(
+                        scale: _isRunning ? 1.0 : _playPulse.value,
+                        child: child,
+                      ),
+                      child: AnimatedBuilder(
+                        animation: _modeColorAnim,
+                        builder: (context, _) => ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                _modeColorAnim.value ?? _themeColor,
+                            foregroundColor: Colors.white,
+                            shape: const CircleBorder(),
+                            padding: const EdgeInsets.all(22),
+                            elevation: 6,
+                            shadowColor:
+                                (_modeColorAnim.value ?? _themeColor)
+                                    .withOpacity(0.4),
+                          ),
+                          onPressed: _toggleTimer,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: Icon(
+                              _isRunning ? Icons.pause : Icons.play_arrow,
+                              key: ValueKey(_isRunning),
+                              size: 36,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 20),
-                  IconButton(
-                    iconSize: 32,
-                    color: AppTheme.textMuted,
-                    icon: const Icon(Icons.skip_next),
-                    tooltip: 'Saltar sesión',
-                    onPressed: () {
-                      _timer?.cancel();
-                      _handleSessionCompleted();
-                    },
-                  ),
-                ],
+                    const SizedBox(width: 24),
+                    IconButton(
+                      iconSize: 28,
+                      color: AppTheme.textMuted,
+                      icon: const Icon(Icons.skip_next),
+                      tooltip: 'Saltar sesión',
+                      onPressed: () {
+                        _timer?.cancel();
+                        setState(() {
+                          _isRunning = false;
+                        });
+                        _handleSessionCompleted();
+                      },
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 24),
@@ -314,9 +426,11 @@ class _PomodoroScreenState extends State<PomodoroScreen> {
   Widget _buildModeTab(String label, PomodoroMode mode) {
     final isSelected = _mode == mode;
     return Expanded(
-      child: GestureDetector(
+      child: BounceTap(
         onTap: () => _switchMode(mode),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: isSelected ? Colors.white : Colors.transparent,

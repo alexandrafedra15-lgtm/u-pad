@@ -6,6 +6,7 @@ class AppTheme {
   // ─── Colores Principales: Equilibrio, Calma y Foco ────────────────────────
   static const Color primary       = Color(0xFF284B3E); // Verde bosque profundo (equilibrio)
   static const Color primaryLight  = Color(0xFF3F6A5B); // Salvia medio
+  static const Color primaryDark   = Color(0xFF1B332A); // Verde bosque oscuro para contraste y badges
   static const Color accentRose    = Color(0xFFD87D65); // Terracota cálido sutil
   static const Color accentSand    = Color(0xFFD4A373); // Arena dorada sutil
 

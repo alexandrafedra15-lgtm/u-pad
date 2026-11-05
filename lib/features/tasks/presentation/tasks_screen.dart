@@ -3,6 +3,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/state/app_state.dart';
 import '../models/task_model.dart';
 import '../../canvas/presentation/canvas_connect_dialog.dart';
+import '../../../core/widgets/animated_widgets.dart';
 
 class TasksScreen extends StatefulWidget {
   final AppState appState;
@@ -21,11 +22,13 @@ class _TasksScreenState extends State<TasksScreen> {
     List<TaskModel> filteredTasks = widget.appState.tasks;
 
     if (_selectedFilter == 'Pendientes') {
-      filteredTasks = filteredTasks.where((t) => t.status != TaskStatus.completada).toList();
+      filteredTasks =
+          filteredTasks.where((t) => t.status != TaskStatus.completada).toList();
     } else if (_selectedFilter == 'Canvas') {
       filteredTasks = filteredTasks.where((t) => t.isFromCanvas).toList();
     } else if (_selectedFilter == 'Completadas') {
-      filteredTasks = filteredTasks.where((t) => t.status == TaskStatus.completada).toList();
+      filteredTasks =
+          filteredTasks.where((t) => t.status == TaskStatus.completada).toList();
     }
 
     return Scaffold(
@@ -39,18 +42,31 @@ class _TasksScreenState extends State<TasksScreen> {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (context) => CanvasConnectDialog(appState: widget.appState),
+                builder: (context) =>
+                    CanvasConnectDialog(appState: widget.appState),
               );
             },
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppTheme.primary,
-        foregroundColor: Colors.white,
-        elevation: 2,
-        onPressed: () => _showAddTaskDialog(context),
-        child: const Icon(Icons.add),
+      floatingActionButton: BounceTap(
+        onTap: () => _showAddTaskDialog(context),
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: AppTheme.primary,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primary.withOpacity(0.35),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.add, color: Colors.white, size: 26),
+        ),
       ),
       body: Column(
         children: [
@@ -72,15 +88,19 @@ class _TasksScreenState extends State<TasksScreen> {
             child: filteredTasks.isEmpty
                 ? const Center(
                     child: Text(
-                      'No hay tareas pendientes en esta vista.',
+                      'No hay tareas en esta vista.',
                       style: TextStyle(color: AppTheme.textSub, fontSize: 14),
                     ),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: filteredTasks.length,
-                    itemBuilder: (context, index) =>
-                        _buildTaskCard(filteredTasks[index]),
+                    itemBuilder: (context, index) {
+                      return FadeSlideIn(
+                        delay: Duration(milliseconds: 40 * index),
+                        child: _buildTaskCard(filteredTasks[index]),
+                      );
+                    },
                   ),
           ),
         ],
@@ -92,109 +112,137 @@ class _TasksScreenState extends State<TasksScreen> {
     final isSelected = _selectedFilter == label;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: isSelected,
-        selectedColor: AppTheme.surfaceCard,
-        backgroundColor: Colors.transparent,
-        side: BorderSide(color: isSelected ? AppTheme.primary : AppTheme.borderSubtle),
-        labelStyle: TextStyle(
-          color: isSelected ? AppTheme.primary : AppTheme.textSub,
-          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-          fontSize: 12,
+      child: BounceTap(
+        onTap: () => setState(() => _selectedFilter = label),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          decoration: BoxDecoration(
+            color: isSelected ? AppTheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isSelected ? AppTheme.primary : AppTheme.borderSubtle,
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : AppTheme.textSub,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              fontSize: 12,
+            ),
+          ),
         ),
-        onSelected: (val) {
-          if (val) setState(() => _selectedFilter = label);
-        },
       ),
     );
   }
 
   Widget _buildTaskCard(TaskModel task) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceCard,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.borderSubtle),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              if (task.isFromCanvas)
-                Container(
-                  margin: const EdgeInsets.only(right: 6),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppTheme.canvasBrand.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(4),
+    final isDone = task.status == TaskStatus.completada;
+    return BounceTap(
+      onTap: () => widget.appState.toggleTaskStatus(task),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isDone
+              ? AppTheme.primary.withOpacity(0.04)
+              : AppTheme.surfaceCard,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isDone ? AppTheme.primary.withOpacity(0.2) : AppTheme.borderSubtle,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (task.isFromCanvas)
+                  Container(
+                    margin: const EdgeInsets.only(right: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppTheme.canvasBrand.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'CANVAS',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.canvasBrand,
+                      ),
+                    ),
                   ),
-                  child: const Text(
-                    'CANVAS',
+                Text(
+                  task.courseName,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textSub,
+                  ),
+                ),
+                const Spacer(),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: isDone
+                        ? AppTheme.primary.withOpacity(0.1)
+                        : AppTheme.accentRose.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    isDone ? 'Listo' : '${task.daysRemaining}d restantes',
                     style: TextStyle(
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.canvasBrand,
+                      color: isDone ? AppTheme.primary : AppTheme.accentRose,
                     ),
                   ),
                 ),
-              Text(
-                task.courseName,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textSub,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                '${task.daysRemaining}d restantes',
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.accentRose,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              IconButton(
-                visualDensity: VisualDensity.compact,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: Icon(
-                  task.status == TaskStatus.completada
-                      ? Icons.check_circle
-                      : Icons.radio_button_unchecked,
-                  color: task.status == TaskStatus.completada
-                      ? AppTheme.primary
-                      : AppTheme.textSub,
-                  size: 20,
-                ),
-                onPressed: () => widget.appState.toggleTaskStatus(task),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  task.title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textMain,
-                    decoration: task.status == TaskStatus.completada
-                        ? TextDecoration.lineThrough
-                        : null,
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                // Animated checkmark
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 280),
+                  transitionBuilder: (child, anim) => ScaleTransition(
+                      scale: anim, child: FadeTransition(opacity: anim, child: child)),
+                  child: Icon(
+                    isDone ? Icons.check_circle : Icons.radio_button_unchecked,
+                    key: ValueKey(isDone),
+                    color: isDone ? AppTheme.primary : AppTheme.textSub,
+                    size: 22,
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 10),
+                Expanded(
+                  child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 300),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: isDone
+                          ? AppTheme.textSub
+                          : AppTheme.textMain,
+                      decoration: isDone ? TextDecoration.lineThrough : null,
+                    ),
+                    child: Text(task.title),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -224,7 +272,10 @@ class _TasksScreenState extends State<TasksScreen> {
             children: [
               const Text(
                 'Nueva Entrega',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textMain),
               ),
               const SizedBox(height: 14),
               TextField(
@@ -234,28 +285,44 @@ class _TasksScreenState extends State<TasksScreen> {
               const SizedBox(height: 10),
               TextField(
                 controller: courseController,
-                decoration: const InputDecoration(labelText: 'Materia / Curso'),
+                decoration:
+                    const InputDecoration(labelText: 'Materia / Curso'),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-                onPressed: () {
+              BounceTap(
+                onTap: () {
                   if (titleController.text.trim().isNotEmpty) {
                     widget.appState.addTask(
                       TaskModel(
                         id: DateTime.now().millisecondsSinceEpoch.toString(),
                         title: titleController.text.trim(),
-                        courseName: courseController.text.trim().isEmpty
-                            ? 'General'
-                            : courseController.text.trim(),
-                        dueDate: DateTime.now().add(const Duration(days: 3)),
+                        courseName:
+                            courseController.text.trim().isEmpty
+                                ? 'General'
+                                : courseController.text.trim(),
+                        dueDate:
+                            DateTime.now().add(const Duration(days: 3)),
                         priority: TaskPriority.media,
                       ),
                     );
                     Navigator.of(context).pop();
                   }
                 },
-                child: const Text('Guardar'),
+                child: Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Guardar',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15),
+                  ),
+                ),
               ),
             ],
           ),
